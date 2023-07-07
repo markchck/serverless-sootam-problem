@@ -21,8 +21,11 @@ functions:
     handler: index.handler
     events:
       - httpApi:
-          path: /create-problem
+          path: /problem
           method: post
+      - httpApi:
+          path: /problem
+          method: get
 plugins:
   - serverless-latest-layer-version
   - serverless-offline
@@ -38,9 +41,30 @@ resources:
             AttributeType: S
           - AttributeName: sk
             AttributeType: S
+          - AttributeName: chapter #단원
+            AttributeType: S
+          - AttributeName: unitName #형태소
+            AttributeType: S
         BillingMode: PAY_PER_REQUEST
         KeySchema:
           - AttributeName: pk
             KeyType: HASH
           - AttributeName: sk
             KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: chapterIndex
+            KeySchema:
+              - AttributeName: chapter
+                KeyType: HASH
+              - AttributeName: unitName
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: unitNameIndex
+            KeySchema:
+              - AttributeName: unitName
+                KeyType: HASH
+              - AttributeName: chapter
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
