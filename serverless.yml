@@ -17,7 +17,7 @@ provider:
         - "dynamodb:DeleteItem"
       Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-sootam-${sls:stage}
 functions:
-  createProblem:
+  Problem:
     handler: index.handler
     events:
       - httpApi:

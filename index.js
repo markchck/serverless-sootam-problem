@@ -1,28 +1,27 @@
-import {createProblem} from './src/mathProblem.js'
+import { createProblem, getProblems } from "./src/mathProblem.js"
 
 export const handler = async (event) => {
   // console.log(event)
   let body
-  try{
+  try {
     switch (event.routeKey) {
-      case 'POST /problem':
+      case "POST /problem":
         await createProblem(event)
         return {
           statusCode: 201,
-          body: "create success"
+          body: "create success",
         }
-      case 'GET /problem':
-          body = await getProblems(event)
-          break
+      case "GET /problem":
+        body = await getProblems(event)
+        break
       default:
         throw new Error(`Unsupported route: "${event.routeKey}"`)
-      }
-   
-  }catch(error){
+    }
+  } catch (error) {
     console.log(error)
     return {
       statusCode: 500,
-      body: JSON.stringify(error.message)
+      body: JSON.stringify(error.message),
     }
   }
 }
