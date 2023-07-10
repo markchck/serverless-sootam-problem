@@ -24,27 +24,21 @@ export const createProblem = async (event) => {
   }
 }
 
-export const getProblems = async (event) => {
+export const getSimilarProblems = async (event) => {
   const { queryStringParameters = undefined } = event
-  const {
-    year = undefined,
-    month = undefined,
-    source = undefined,
-    type = undefined,
-    number = undefined,
-    chapter = undefined,
-    unitName = undefined,
-  } = queryStringParameters
+  const { chapter = undefined, unitName = undefined } = queryStringParameters
 
   const getParams = {
     TableName: process.env.DYNAMODB_SOOTAM_TABLE,
     IndexName: "unitNameIndex",
-    KeyConditionExpression: "#unitName = :unitName",
+    KeyConditionExpression: "#unitName = :unitName and #chapter = :chapter",
     ExpressionAttributeNames: {
       "#unitName": "unitName",
+      "#chapter": "chapter",
     },
     ExpressionAttributeValues: {
       ":unitName": unitName,
+      ":chapter": chapter,
     },
   }
   const { Items } = await query(getParams)

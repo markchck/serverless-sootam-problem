@@ -1,4 +1,4 @@
-import { createProblem, getProblems } from "./src/mathProblem.js"
+import { createProblem, getSimilarProblems } from "./src/mathProblem.js"
 
 export const handler = async (event) => {
   // console.log(event)
@@ -9,7 +9,7 @@ export const handler = async (event) => {
         response = await createProblem(event)
         break
       case "GET /problem":
-        response = await getProblems(event)
+        response = await getSimilarProblems(event)
         break
       default:
         throw new Error(`Unsupported route: "${event.routeKey}"`)
