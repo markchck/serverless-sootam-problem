@@ -1,4 +1,4 @@
-import { putItem } from "../lib/dynamoDB.js"
+import { putItem, query } from "../lib/dynamoDB.js"
 
 export const createProblem = async (event) => {
   // console.log(event)
@@ -17,14 +17,15 @@ export const createProblem = async (event) => {
       unitName: body?.unitName,
     },
   }
-  return await putItem(putParams)
+  await putItem(putParams)
+  return {
+    statusCode: 201,
+    body: "create success",
+  }
 }
 
-import AWS from "aws-sdk"
-const docClient = new AWS.DynamoDB.DocumentClient()
-
 export const getProblems = async (event) => {
-  const queryStringParameters = event.queryStringParameters
+  const { queryStringParameters = undefined } = event
   const {
     year = undefined,
     month = undefined,
@@ -33,9 +34,8 @@ export const getProblems = async (event) => {
     number = undefined,
     chapter = undefined,
     unitName = undefined,
-  } = queryStringParameters || {}
+  } = queryStringParameters
 
-  let lastKey = null
   const getParams = {
     TableName: process.env.DYNAMODB_SOOTAM_TABLE,
     IndexName: "unitNameIndex",
@@ -47,16 +47,10 @@ export const getProblems = async (event) => {
       ":unitName": unitName,
     },
   }
+  const { Items } = await query(getParams)
 
-  docClient
-    .query(getParams)
-    .promise()
-    .then((res) => {
-      res.Items.forEach(function (item) {
-        console.log(item)
-      })
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+  return {
+    statusCode: 200,
+    body: JSON.stringify(Items),
+  }
 }

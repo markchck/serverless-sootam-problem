@@ -2,21 +2,19 @@ import { createProblem, getProblems } from "./src/mathProblem.js"
 
 export const handler = async (event) => {
   // console.log(event)
-  let body
+  let response
   try {
     switch (event.routeKey) {
       case "POST /problem":
-        await createProblem(event)
-        return {
-          statusCode: 201,
-          body: "create success",
-        }
+        response = await createProblem(event)
+        break
       case "GET /problem":
-        body = await getProblems(event)
+        response = await getProblems(event)
         break
       default:
         throw new Error(`Unsupported route: "${event.routeKey}"`)
     }
+    return response
   } catch (error) {
     console.log(error)
     return {
