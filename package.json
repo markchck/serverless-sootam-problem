@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.363.0",
-    "@aws-sdk/lib-dynamodb": "^3.365.0"
+    "@aws-sdk/lib-dynamodb": "^3.365.0",
+    "aws-sdk": "^2.1413.0"
   },
   "devDependencies": {
     "eslint": "^8.44.0",

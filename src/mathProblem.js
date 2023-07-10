@@ -1,4 +1,4 @@
-import { putItem, query } from "../lib/dynamoDB.js"
+import { putItem } from "../lib/dynamoDB.js"
 
 export const createProblem = async (event) => {
   // console.log(event)
@@ -20,6 +20,9 @@ export const createProblem = async (event) => {
   return await putItem(putParams)
 }
 
+import AWS from "aws-sdk"
+const docClient = new AWS.DynamoDB.DocumentClient()
+
 export const getProblems = async (event) => {
   const queryStringParameters = event.queryStringParameters
   const {
@@ -35,20 +38,25 @@ export const getProblems = async (event) => {
   let lastKey = null
   const getParams = {
     TableName: process.env.DYNAMODB_SOOTAM_TABLE,
-    IndexName: unitNameIndex,
-    keyConditionExpression: "unitName = :pk and capter = :sk",
+    IndexName: "unitNameIndex",
+    KeyConditionExpression: "#unitName = :unitName",
     ExpressionAttributeNames: {
-      ":pk": unitName,
-      ":sk": chapter,
+      "#unitName": "unitName",
     },
-    ExclusiveStartKey: lastKey,
+    ExpressionAttributeValues: {
+      ":unitName": unitName,
+    },
   }
 
-  let request = []
-  do {
-    const { Items: items, LastEvaluatedKey: key } = await query(getParams)
-    request.push(...items)
-    lastKey = key
-  } while (lastKey)
-  console.log(request)
+  docClient
+    .query(getParams)
+    .promise()
+    .then((res) => {
+      res.Items.forEach(function (item) {
+        console.log(item)
+      })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
 }
