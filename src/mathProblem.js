@@ -7,14 +7,21 @@ export const createProblem = async (event) => {
     TableName: process.env.DYNAMODB_SOOTAM_TABLE,
     Item: {
       pk: "problem",
-      sk: body?.problemId,
+      sk: `problemId#${problemId}`,
       year: body?.year,
       month: body?.month,
-      source: body?.source,
-      type: body?.type,
       number: body?.number,
-      chapter: body?.chapter,
+      successRate: body?.successRate,
+      problemImage: body?.problemImage,
+      solutionImage: body?.solutionImage,
+      answer: body?.answer,
+      testType: body?.testType,
+      copyright: body?.copyright,
+      unitId: body?.unitId,
       unitName: body?.unitName,
+      chapter: body?.chapter,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
   }
   await putItem(putParams)
@@ -26,7 +33,7 @@ export const createProblem = async (event) => {
 
 export const getSimilarProblems = async (event) => {
   const { queryStringParameters = undefined } = event
-  const { chapter = undefined, unitName = undefined } = queryStringParameters
+  const { chapter = "", unitName = "" } = queryStringParameters
 
   const getParams = {
     TableName: process.env.DYNAMODB_SOOTAM_TABLE,
@@ -39,6 +46,43 @@ export const getSimilarProblems = async (event) => {
     ExpressionAttributeValues: {
       ":unitName": unitName,
       ":chapter": chapter,
+    },
+  }
+  const { Items } = await query(getParams)
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(Items),
+  }
+}
+
+export const getSingleProblem = async (event) => {
+  const { queryStringParameters = undefined } = event
+  const {
+    year = "",
+    month = "",
+    copyright = "",
+    testType = "",
+    number = "",
+  } = queryStringParameters
+
+  const getParams = {
+    TableName: process.env.DYNAMODB_SOOTAM_TABLE,
+    KeyConditionExpression: "pk = :pk",
+    FilterExpression:
+      "#problemYear = :year AND #problemMonth = :month AND #problemNumber = :number AND testType = :testType AND copyright = :copyright",
+    ExpressionAttributeNames: {
+      "#problemYear": "year",
+      "#problemMonth": "month",
+      "#problemNumber": "number",
+    },
+    ExpressionAttributeValues: {
+      ":pk": "problem",
+      ":year": year,
+      ":month": month,
+      ":number": number,
+      ":testType": testType,
+      ":copyright": copyright,
     },
   }
   const { Items } = await query(getParams)
